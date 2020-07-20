@@ -1,21 +1,45 @@
 #include "Game.h"
+
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
-const char* vertexShaderSource =
-"#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
+#include <cmath>
 
-const char* fragmentShaderSource =
-"#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()"
-"{\n"
-"FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);"
-"}\0";
+ShaderProgramSource Game::ParseShader(const std::string& aFilePath)
+{
+    enum class ShaderType
+    {
+        NONE = -1,
+        VERTEX = 0,
+        FRAGMENT = 1
+    };
+    ShaderType type = ShaderType::NONE;
+    std::ifstream stream(aFilePath);
+
+    std::string line;
+    std::stringstream ss[2];
+    while(getline(stream, line))
+    {
+        if(line.find("#shader") != std::string::npos)
+        {
+            if(line.find("vertex") != std::string::npos)
+            {
+                type = ShaderType::VERTEX;
+            }
+            else if(line.find("fragment") != std::string::npos)
+            {
+                type = ShaderType::FRAGMENT;
+            }
+        }
+        else
+        {
+            ss[(int)type] << line << '\n';
+        }
+    }
+
+    return {ss[0].str(), ss[1].str()};
+}
 
 bool Game::Init()
 {
@@ -56,10 +80,14 @@ bool Game::Init()
     glGenBuffers(1, &myVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    //Get shader from file
+    ShaderProgramSource source = ParseShader("res/shaders/Basic.glsl");
+
     //Create vertex shader
     unsigned int vertexShader;
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    const char* vertexSource = source.VertexSource.c_str();
+    glShaderSource(vertexShader, 1, &vertexSource, NULL);
     glCompileShader(vertexShader);
 
     //Check for errors
@@ -76,7 +104,8 @@ bool Game::Init()
     //Create fragment shader
     unsigned int fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    const char* fragmentSource = source.FragmentSource.c_str();
+    glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
     glCompileShader(fragmentShader);
 
     //Check for errors
@@ -151,6 +180,13 @@ bool Game::Update()
     //Draw opengl stuff
 
     glUseProgram(myShaderProgram);
+
+    auto timeValue = SDL_GetTicks();
+    float fTime = timeValue / 1000.f;
+    float greenValue = sin(fTime) / 2.0f + 0.5f;
+    int vertexColorLocation = glGetUniformLocation(myShaderProgram, "ourColor");
+    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
     glBindVertexArray(myVAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
@@ -167,7 +203,6 @@ void Game::Start()
     {
         myFinished = Update();
     }
-    SDL_GL_DeleteContext(myGContext);
     SDL_DestroyWindow(myGWindow);
     SDL_Quit();
 }

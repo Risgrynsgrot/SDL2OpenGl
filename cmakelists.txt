@@ -1,0 +1,17 @@
+cmake_minimum_required(VERSION 3.15)
+project(SDLOpenGL VERSION 1.0.0)
+
+add_executable(game source/Game.cpp source/main.cpp)
+
+
+find_package(SDL2 REQUIRED)
+if (SDL2_FOUND)
+    include_directories(${SDL2_INCLUDE_DIRS})
+    link_libraries(${SDL2_LIBRARIES})
+endif()
+
+find_package(GLEW REQUIRED)
+if (GLEW_FOUND)
+    include_directories(${GLEW_INCLUDE_DIRS})
+    link_libraries(${GLEW_LIBRARIES})
+endif()

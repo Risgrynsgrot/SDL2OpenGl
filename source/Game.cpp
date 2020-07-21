@@ -1,45 +1,7 @@
 #include "Game.h"
-
-#include <iostream>
-#include <fstream>
-#include <sstream>
-
 #include <cmath>
+#include "ShaderUtility.h"
 
-ShaderProgramSource Game::ParseShader(const std::string& aFilePath)
-{
-    enum class ShaderType
-    {
-        NONE = -1,
-        VERTEX = 0,
-        FRAGMENT = 1
-    };
-    ShaderType type = ShaderType::NONE;
-    std::ifstream stream(aFilePath);
-
-    std::string line;
-    std::stringstream ss[2];
-    while(getline(stream, line))
-    {
-        if(line.find("#shader") != std::string::npos)
-        {
-            if(line.find("vertex") != std::string::npos)
-            {
-                type = ShaderType::VERTEX;
-            }
-            else if(line.find("fragment") != std::string::npos)
-            {
-                type = ShaderType::FRAGMENT;
-            }
-        }
-        else
-        {
-            ss[(int)type] << line << '\n';
-        }
-    }
-
-    return {ss[0].str(), ss[1].str()};
-}
 
 bool Game::Init()
 {
@@ -64,10 +26,11 @@ bool Game::Init()
 
     float vertices[] =
     {
-         0.5f,  0.5f, 0.0f, //Top right
-         0.5f, -0.5f, 0.0f, //Bottom right
-        -0.5f, -0.5f, 0.0f, //Bottom left
-        -0.5f,  0.5f, 0.0f  //Top left
+         //Positions        //Colors
+         0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,//Top right
+         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,//Bottom right
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,//Bottom left
+        -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f  //Top left
 
     };
 
@@ -86,7 +49,7 @@ bool Game::Init()
     //Create vertex shader
     unsigned int vertexShader;
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    const char* vertexSource = source.VertexSource.c_str();
+    const char* vertexSource = source.VertexSource;
     glShaderSource(vertexShader, 1, &vertexSource, NULL);
     glCompileShader(vertexShader);
 
@@ -104,7 +67,7 @@ bool Game::Init()
     //Create fragment shader
     unsigned int fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    const char* fragmentSource = source.FragmentSource.c_str();
+    const char* fragmentSource = source.FragmentSource;
     glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
     glCompileShader(fragmentShader);
 
@@ -155,8 +118,12 @@ bool Game::Init()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     //then set our vertex attributes pointers
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    //Position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    //Color
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     return true;
 }
@@ -181,11 +148,11 @@ bool Game::Update()
 
     glUseProgram(myShaderProgram);
 
-    auto timeValue = SDL_GetTicks();
-    float fTime = timeValue / 1000.f;
-    float greenValue = sin(fTime) / 2.0f + 0.5f;
-    int vertexColorLocation = glGetUniformLocation(myShaderProgram, "ourColor");
-    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+   // auto timeValue = SDL_GetTicks();
+   // float fTime = timeValue / 1000.f;
+   // float greenValue = sin(fTime) / 2.0f + 0.5f;
+   // int vertexColorLocation = glGetUniformLocation(myShaderProgram, "ourColor");
+   // glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
     glBindVertexArray(myVAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

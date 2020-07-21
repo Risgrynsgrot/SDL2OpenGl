@@ -4,11 +4,6 @@
 #include <SDL2/SDL_opengl.h>
 #include <string>
 
-struct ShaderProgramSource
-{
-    std::string VertexSource;
-    std::string FragmentSource;
-};
 
 class Game
 {
@@ -20,7 +15,6 @@ class Game
         bool Update();
         void Render();
         void Close();
-        ShaderProgramSource ParseShader(const std::string& aFilePath);
     private:
         SDL_Window* myGWindow = NULL;
         SDL_GLContext myGContext;

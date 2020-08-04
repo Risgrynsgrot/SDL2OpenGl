@@ -8,6 +8,7 @@ class Shader
 {
     public:
 
+        Shader();
         Shader(const char* aFilePath);
 
         void Use();

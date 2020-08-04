@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[])
 {
-    Game game = Game();
+    Game game;
     if(game.Init())
     {
         std::cout << "nice?";

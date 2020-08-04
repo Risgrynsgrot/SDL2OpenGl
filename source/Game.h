@@ -2,12 +2,14 @@
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
+#include "Shader.h"
 #include <string>
 
 
 class Game
 {
     public:
+        Game();
         bool Init();
         void Start();
         bool InitGL();
@@ -27,5 +29,6 @@ class Game
         unsigned int myVAO;
         unsigned int myEBO;
         unsigned int myShaderProgram;
+        Shader myShader;
 
 };

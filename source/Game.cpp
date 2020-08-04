@@ -2,6 +2,10 @@
 #include <cmath>
 #include "ShaderUtility.h"
 
+Game::Game()
+{
+
+}
 
 bool Game::Init()
 {
@@ -23,6 +27,8 @@ bool Game::Init()
         std::cout << "Failed to initialize GLEW" << std::endl;
         return false;
     }
+
+    myShader = Shader("res/shaders/Basic.glsl");
 
     float vertices[] =
     {
@@ -47,58 +53,58 @@ bool Game::Init()
     ShaderProgramSource source = ParseShader("res/shaders/Basic.glsl");
 
     //Create vertex shader
-    unsigned int vertexShader;
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    const char* vertexSource = source.VertexSource;
-    glShaderSource(vertexShader, 1, &vertexSource, NULL);
-    glCompileShader(vertexShader);
+    //unsigned int vertexShader;
+    //vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    //const char* vertexSource = source.VertexSource;
+    //glShaderSource(vertexShader, 1, &vertexSource, NULL);
+    //glCompileShader(vertexShader);
 
     //Check for errors
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if(!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-        return false;
-    }
+    //int success;
+    //char infoLog[512];
+    //glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    //if(!success)
+    //{
+    //    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+    //    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    //    return false;
+    //}
 
-    //Create fragment shader
-    unsigned int fragmentShader;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    const char* fragmentSource = source.FragmentSource;
-    glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-    glCompileShader(fragmentShader);
+    ////Create fragment shader
+    //unsigned int fragmentShader;
+    //fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    //const char* fragmentSource = source.FragmentSource;
+    //glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
+    //glCompileShader(fragmentShader);
 
-    //Check for errors
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if(!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-        return false;
-    }
+    ////Check for errors
+    //glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    //if(!success)
+    //{
+    //    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+    //    std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+    //    return false;
+    //}
 
-    //Create and link the shaderProgram
-    myShaderProgram = glCreateProgram();
-    glAttachShader(myShaderProgram, vertexShader);
-    glAttachShader(myShaderProgram, fragmentShader);
-    glLinkProgram(myShaderProgram);
+    ////Create and link the shaderProgram
+    //myShaderProgram = glCreateProgram();
+    //glAttachShader(myShaderProgram, vertexShader);
+    //glAttachShader(myShaderProgram, fragmentShader);
+    //glLinkProgram(myShaderProgram);
 
-    //Check for errors
-    glGetProgramiv(myShaderProgram, GL_LINK_STATUS, &success);
-    if(!success)
-    {
-        glGetProgramInfoLog(myShaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
-        return false;
-    }
+    ////Check for errors
+    //glGetProgramiv(myShaderProgram, GL_LINK_STATUS, &success);
+    //if(!success)
+    //{
+    //    glGetProgramInfoLog(myShaderProgram, 512, NULL, infoLog);
+    //    std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
+    //    return false;
+    //}
 
 
-    //Delete shaders, they are already inside the shader program
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    ////Delete shaders, they are already inside the shader program
+    //glDeleteShader(vertexShader);
+    //glDeleteShader(fragmentShader);
 
     //Setup EBO
     glGenBuffers(1, &myEBO);
@@ -146,7 +152,8 @@ bool Game::Update()
 
     //Draw opengl stuff
 
-    glUseProgram(myShaderProgram);
+    //glUseProgram(myShaderProgram);
+    myShader.Use();
 
    // auto timeValue = SDL_GetTicks();
    // float fTime = timeValue / 1000.f;

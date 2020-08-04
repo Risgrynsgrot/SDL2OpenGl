@@ -6,8 +6,8 @@
 
 struct ShaderProgramSource
 {
-    const char* VertexSource;
-    const char* FragmentSource;
+    std::string VertexSource;
+    std::string FragmentSource;
 };
 
 inline ShaderProgramSource ParseShader(const char* aFilePath)
@@ -42,5 +42,5 @@ inline ShaderProgramSource ParseShader(const char* aFilePath)
         }
     }
 
-    return {ss[0].str().c_str(), ss[1].str().c_str()};
+    return {ss[0].str(), ss[1].str()};
 }

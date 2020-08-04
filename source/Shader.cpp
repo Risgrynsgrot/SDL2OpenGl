@@ -1,6 +1,11 @@
 #include "Shader.h"
 #include "ShaderUtility.h"
 
+Shader::Shader()
+{
+
+}
+
 Shader::Shader(const char* aFilePath)
 {
     ShaderProgramSource shaderSource = ParseShader(aFilePath);
@@ -10,12 +15,14 @@ Shader::Shader(const char* aFilePath)
 
     //vertex Shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &shaderSource.VertexSource, NULL);
+    const char* vertexCString = shaderSource.VertexSource.c_str();
+    glShaderSource(vertex, 1, &vertexCString, NULL);
     glCompileShader(vertex);
     CheckCompileErrors(vertex, "VERTEX");
 
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &shaderSource.FragmentSource, NULL);
+    const char* fragmentCString = shaderSource.FragmentSource.c_str();
+    glShaderSource(fragment, 1, &fragmentCString, NULL);
     glCompileShader(fragment);
     CheckCompileErrors(fragment, "FRAGMENT");
 
@@ -38,7 +45,7 @@ void Shader::CheckCompileErrors(unsigned int aShader, std::string aType)
         if(!success)
         {
             glGetProgramInfoLog(aShader, 512, NULL, infoLog);
-            std::cout << "ERROR: ShaderProgram of type " << aType << "Failed to Link\n" << infoLog;
+            std::cout << "ERROR: ShaderProgram of type " << aType << " Failed to Link\n" << infoLog;
         }
     }
     else
@@ -47,7 +54,7 @@ void Shader::CheckCompileErrors(unsigned int aShader, std::string aType)
         if(!success)
         {
             glGetShaderInfoLog(aShader, 512, NULL, infoLog);
-            std::cout << "ERROR: Shader of type " << aType << "Failed to compile\n" << infoLog;
+            std::cout << "ERROR: Shader of type " << aType << " Failed to compile\n" << infoLog;
         }
     }
 }

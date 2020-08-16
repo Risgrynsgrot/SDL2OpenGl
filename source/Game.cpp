@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <cmath>
 #include "ShaderUtility.h"
+#include "stb_image.h"
 
 Game::Game()
 {
@@ -32,11 +33,10 @@ bool Game::Init()
 
     float vertices[] =
     {
-         //Positions        //Colors
-         0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,//Top right
-         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,//Bottom right
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,//Bottom left
-        -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f  //Top left
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
 
     };
 
@@ -45,6 +45,8 @@ bool Game::Init()
         0, 1, 3, //first triangle
         1, 2, 3  //second triangle
     };
+
+
     //Setup vertex buffer
     glGenBuffers(1, &myVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -101,7 +103,6 @@ bool Game::Init()
     //    return false;
     //}
 
-
     ////Delete shaders, they are already inside the shader program
     //glDeleteShader(vertexShader);
     //glDeleteShader(fragmentShader);
@@ -125,20 +126,52 @@ bool Game::Init()
 
     //then set our vertex attributes pointers
     //Position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
     //Color
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    //Texture coords
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    //Load a texture
+    glGenTextures(1, &myTexture);
+    glBindTexture(GL_TEXTURE_2D, myTexture);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    int width, height, nrChannels;
+    unsigned char *imgData = stbi_load("res/sprites/circle.jpg", &width, &height, &nrChannels, 0);
+
+    if (imgData != nullptr)
+    {
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imgData);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load Texture" << std::endl;
+    }
+    stbi_image_free(imgData);
+
+    myShader.Use();
+
+    myShader.SetInt("texture1", 0);
 
     return true;
 }
 
 bool Game::Update()
 {
-    if(SDL_PollEvent(&myWindowEvent))
+    if (SDL_PollEvent(&myWindowEvent))
     {
-        if(myWindowEvent.type == SDL_QUIT)
+        if (myWindowEvent.type == SDL_QUIT)
         {
             return true;
         }
@@ -149,17 +182,19 @@ bool Game::Update()
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-
     //Draw opengl stuff
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, myTexture);
 
     //glUseProgram(myShaderProgram);
     myShader.Use();
 
-   // auto timeValue = SDL_GetTicks();
-   // float fTime = timeValue / 1000.f;
-   // float greenValue = sin(fTime) / 2.0f + 0.5f;
-   // int vertexColorLocation = glGetUniformLocation(myShaderProgram, "ourColor");
-   // glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+    // auto timeValue = SDL_GetTicks();
+    // float fTime = timeValue / 1000.f;
+    // float greenValue = sin(fTime) / 2.0f + 0.5f;
+    // int vertexColorLocation = glGetUniformLocation(myShaderProgram, "ourColor");
+    // glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
     glBindVertexArray(myVAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -173,10 +208,15 @@ bool Game::Update()
 void Game::Start()
 {
     myFinished = false;
-    while(!myFinished)
+    while (!myFinished)
     {
         myFinished = Update();
-    }
+    }    
+
+    glDeleteVertexArrays(1, &myVAO);
+    glDeleteBuffers(1, &myVBO);
+    glDeleteBuffers(1, &myEBO);
+
     SDL_DestroyWindow(myGWindow);
     SDL_Quit();
 }

@@ -29,6 +29,7 @@ class Game
         unsigned int myVAO;
         unsigned int myEBO;
         unsigned int myShaderProgram;
+        unsigned int myTexture;
         Shader myShader;
 
 };

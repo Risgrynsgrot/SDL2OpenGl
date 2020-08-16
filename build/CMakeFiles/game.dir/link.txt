@@ -1,0 +1,1 @@
+"D:\Program Files\LLVM\bin\clang++.exe" -fuse-ld=lld-link -nostartfiles -nostdlib -D_DLL -D_MT -Xclang --dependent-lib=msvcrt   @CMakeFiles\game.dir\objects1.rsp  -o game.exe -Xlinker /implib:game.lib -Xlinker /pdb:G:\Git\SDL2OpenGl\build\game.pdb -Xlinker /version:0.0  

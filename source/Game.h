@@ -4,6 +4,12 @@
 #include <SDL2/SDL_opengl.h>
 #include "Shader.h"
 #include <string>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "Input.h"
+#include "Camera.h"
+#include "Constants.h"
 
 
 class Game
@@ -11,18 +17,16 @@ class Game
     public:
         Game();
         bool Init();
+        void GameInit();
         void Start();
-        bool InitGL();
-        void HandleKeys(unsigned char aKey, int aX, int aY);
-        bool Update();
+        bool Update(float aDeltaTime);
         void Render();
         void Close();
     private:
+        void HandleInput();
         SDL_Window* myGWindow = NULL;
         SDL_GLContext myGContext;
         bool myGRenderQuad = true;
-        const GLint SCREEN_WIDTH = 1280;
-        const GLint SCREEN_HEIGHT = 720;
         SDL_Event myWindowEvent;
         bool myFinished;
         unsigned int myVBO;
@@ -31,5 +35,8 @@ class Game
         unsigned int myShaderProgram;
         unsigned int myTexture;
         Shader myShader;
+        glm::mat4 myProjection;
+        glm::mat4 myModel;
+        Camera myCamera;
 
 };

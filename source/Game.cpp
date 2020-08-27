@@ -2,6 +2,7 @@
 #include <cmath>
 #include "ShaderUtility.h"
 #include "stb_image.h"
+#include "Math.h"
 
 Game::Game()
 {
@@ -29,23 +30,69 @@ bool Game::Init()
         return false;
     }
 
+    //configure global opengl state
+    glEnable(GL_DEPTH_TEST);
+
     myShader = Shader("res/shaders/Basic.glsl");
 
-    float vertices[] =
+    //    float vertices[] =
+    //    {
+    //         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+    //         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+    //        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+    //        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left
+    //
+    //    };
+    float vertices[] = 
     {
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
 
-    };
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+
+        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f
+        };
 
     unsigned int indices[] =
-    {
-        0, 1, 3, //first triangle
-        1, 2, 3  //second triangle
-    };
-
+        {
+            0, 1, 3, //first triangle
+            1, 2, 3  //second triangle
+        };
 
     //Setup vertex buffer
     glGenBuffers(1, &myVBO);
@@ -53,59 +100,6 @@ bool Game::Init()
 
     //Get shader from file
     ShaderProgramSource source = ParseShader("res/shaders/Basic.glsl");
-
-    //Create vertex shader
-    //unsigned int vertexShader;
-    //vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    //const char* vertexSource = source.VertexSource;
-    //glShaderSource(vertexShader, 1, &vertexSource, NULL);
-    //glCompileShader(vertexShader);
-
-    //Check for errors
-    //int success;
-    //char infoLog[512];
-    //glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    //if(!success)
-    //{
-    //    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-    //    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    //    return false;
-    //}
-
-    ////Create fragment shader
-    //unsigned int fragmentShader;
-    //fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    //const char* fragmentSource = source.FragmentSource;
-    //glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-    //glCompileShader(fragmentShader);
-
-    ////Check for errors
-    //glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    //if(!success)
-    //{
-    //    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-    //    std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    //    return false;
-    //}
-
-    ////Create and link the shaderProgram
-    //myShaderProgram = glCreateProgram();
-    //glAttachShader(myShaderProgram, vertexShader);
-    //glAttachShader(myShaderProgram, fragmentShader);
-    //glLinkProgram(myShaderProgram);
-
-    ////Check for errors
-    //glGetProgramiv(myShaderProgram, GL_LINK_STATUS, &success);
-    //if(!success)
-    //{
-    //    glGetProgramInfoLog(myShaderProgram, 512, NULL, infoLog);
-    //    std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
-    //    return false;
-    //}
-
-    ////Delete shaders, they are already inside the shader program
-    //glDeleteShader(vertexShader);
-    //glDeleteShader(fragmentShader);
 
     //Setup EBO
     glGenBuffers(1, &myEBO);
@@ -120,25 +114,26 @@ bool Game::Init()
     glBindBuffer(GL_ARRAY_BUFFER, myVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    //TEMPORARILY COMMENTED OUT
     //copy our index array in a element buffer for OpenGL to use
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, myEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, myEBO);
+    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     //then set our vertex attributes pointers
     //Position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
     //Color
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+    //glEnableVertexAttribArray(1);
     //Texture coords
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     //Load a texture
     glGenTextures(1, &myTexture);
     glBindTexture(GL_TEXTURE_2D, myTexture);
-    
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 
@@ -146,12 +141,12 @@ bool Game::Init()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     int width, height, nrChannels;
-    unsigned char *imgData = stbi_load("res/sprites/circle.jpg", &width, &height, &nrChannels, 0);
+    unsigned char *imgData = stbi_load("res/sprites/circle.png", &width, &height, &nrChannels, STBI_rgb_alpha);
 
     if (imgData != nullptr)
     {
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imgData);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imgData);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
@@ -164,40 +159,64 @@ bool Game::Init()
 
     myShader.SetInt("texture1", 0);
 
+    //perspective projection, set here because it doesn't change
+    myProjection = glm::perspective(glm::radians(90.f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.f);
+    myShader.SetMat4("projection", myProjection);
+
+    GameInit();
+
     return true;
 }
 
-bool Game::Update()
+void Game::GameInit()
 {
-    if (SDL_PollEvent(&myWindowEvent))
+    myCamera.Init();
+}
+
+
+bool Game::Update(float aDeltaTime)
+{
+    //Polling events and updating input stuff
+    while (SDL_PollEvent(&myWindowEvent))
     {
-        if (myWindowEvent.type == SDL_QUIT)
+        switch (myWindowEvent.type)
         {
+        case SDL_MOUSEMOTION:
+            INPUT->myMouseMovement = glm::vec2(myWindowEvent.motion.xrel, myWindowEvent.motion.yrel);
+            break;
+        case SDL_QUIT:
             return true;
         }
     }
+    myCamera.Update(aDeltaTime);
 
     //Update gamelogic
 
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    //Update keystates last, maybe do a beginning of frame and end of frame, because I think this makes the input have 1 frame of lag
+    INPUT->Update();
 
     //Draw opengl stuff
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, myTexture);
 
-    //glUseProgram(myShaderProgram);
     myShader.Use();
 
-    // auto timeValue = SDL_GetTicks();
-    // float fTime = timeValue / 1000.f;
-    // float greenValue = sin(fTime) / 2.0f + 0.5f;
-    // int vertexColorLocation = glGetUniformLocation(myShaderProgram, "ourColor");
-    // glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+    auto timeValue = SDL_GetTicks();
+    float fTime = timeValue / 1000.f;
+
+    //Transforms for the model
+    myModel = glm::mat4(1.0f);
+    myModel = glm::rotate(myModel, fTime * glm::radians(50.f), glm::vec3(0.5f, 1.0f, 0.0f));
+
+    myShader.SetMat4("model", myModel);
+    myShader.SetMat4("view", myCamera.GetViewMatrix());
 
     glBindVertexArray(myVAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
 
     SDL_GL_SwapWindow(myGWindow);
@@ -208,10 +227,18 @@ bool Game::Update()
 void Game::Start()
 {
     myFinished = false;
+    auto lastFrameTime = SDL_GetTicks();
+    auto currentFrameTime = SDL_GetTicks();
+    float deltaTime = 0.f;
     while (!myFinished)
     {
-        myFinished = Update();
-    }    
+        currentFrameTime = SDL_GetTicks();
+        deltaTime = (currentFrameTime - lastFrameTime);
+        deltaTime *= 0.01;
+        lastFrameTime = currentFrameTime;
+        //printf("current: %d, last: %d, delta: %f\n", currentFrameTime, lastFrameTime, deltaTime);
+        myFinished = Update(deltaTime);
+    }
 
     glDeleteVertexArrays(1, &myVAO);
     glDeleteBuffers(1, &myVBO);

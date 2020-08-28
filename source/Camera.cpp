@@ -32,7 +32,7 @@ void Camera::HandleInput()
         pitch = 89.0f;
     if(pitch < -89.0f)
         pitch = -89.0f;
-    printf("CameraAngle: pitch: %f yaw: %f\n", pitch, yaw);
+    //printf("CameraAngle: pitch: %f yaw: %f\n", pitch, yaw);
 
     glm::vec3 direction;
     direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));

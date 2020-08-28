@@ -1,3 +1,0 @@
-G:/Git/SDL2OpenGl/build/CMakeFiles/game.dir
-G:/Git/SDL2OpenGl/build/CMakeFiles/edit_cache.dir
-G:/Git/SDL2OpenGl/build/CMakeFiles/rebuild_cache.dir

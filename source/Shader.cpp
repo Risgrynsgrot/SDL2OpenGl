@@ -16,12 +16,14 @@ Shader::Shader(const char* aFilePath)
     //vertex Shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
     const char* vertexCString = shaderSource.VertexSource.c_str();
+    printf("%s", vertexCString);
     glShaderSource(vertex, 1, &vertexCString, NULL);
     glCompileShader(vertex);
     CheckCompileErrors(vertex, "VERTEX");
 
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
     const char* fragmentCString = shaderSource.FragmentSource.c_str();
+    printf("%s", fragmentCString);
     glShaderSource(fragment, 1, &fragmentCString, NULL);
     glCompileShader(fragment);
     CheckCompileErrors(fragment, "FRAGMENT");

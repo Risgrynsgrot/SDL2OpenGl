@@ -1,0 +1,15 @@
+# ninja log v5
+7	1072	6203262602384057	CMakeFiles/game.dir/source/stb_image.cpp.obj	cae5bdbdaffd6b1f
+0	2477	6203262616549883	CMakeFiles/game.dir/source/main.cpp.obj	cb852bdb83185300
+12	2385	6203262615225561	CMakeFiles/game.dir/source/Input.cpp.obj	7b01056351eeb61d
+3	796	6203281949846061	CMakeFiles/game.dir/source/Shader.cpp.obj	715257ed7490df71
+7	801	6203281949930380	CMakeFiles/game.dir/source/Camera.cpp.obj	7e698b6800d9b70a
+1	294	6203286610788678	build.ninja	9a358ac6d513c0df
+3	2521	6203280205643205	CMakeFiles/game.dir/source/Game.cpp.obj	b030e1b37f61e603
+4	160	6203286663051014	bin/game.exe	c8ace97e3f0928af
+3	952	6203291156432941	CMakeFiles/game.dir/source/Game.cpp.obj	b030e1b37f61e603
+952	1124	6203291157941104	bin/game.exe	c8ace97e3f0928af
+3	926	6203291409402089	CMakeFiles/game.dir/source/Game.cpp.obj	b030e1b37f61e603
+926	1085	6203291410919852	bin/game.exe	c8ace97e3f0928af
+3	916	6203291952747342	CMakeFiles/game.dir/source/Game.cpp.obj	b030e1b37f61e603
+916	1138	6203291954880136	bin/game.exe	c8ace97e3f0928af
